@@ -22,8 +22,8 @@ rawX_test = (X_test-X_test.mean(axis=0))/263
 def linRaw():
     #linear SVM on raw data
     acc = []
-    for c in [0.01,0.1,1,10]:
-        clf = svm.LinearSVR(C=c)
+    for c in [0.01,0.1,10]:
+        clf = svm.SVC(kernel='linear',C=c)
         clf.fit(rawX, Y)
         results = np.rint(clf.predict(rawX_test))
         print(results)
@@ -32,10 +32,10 @@ def linRaw():
         acc.append(accuracy)
     return acc
     '''Results:
-            0.2581
-            0.2572
-            failed to converge => increase number of iterations => 0.2566
-            failed to converge => increase number of iterations => 0.2477
+            0.9404
+            0.9449
+            0.9377
+            0.9281
 
             The parameter C, common to all SVM kernels, trades off misclassification of training examples against simplicity of the decision surface. A low C makes the decision surface smooth, while a high C aims at classifying all training examples correctly. gamma defines how much influence a single training example has. The larger gamma is, the closer other examples must be to be affected.
     '''
@@ -44,18 +44,19 @@ def plot_lin():
     '''Train and evaluate linear SVMs on the dataset reduced to different dimensions using PCA
     for different values of C, and plot the accuracies'''
 
-    Acc = [[0.2581,0.2572,0.2566,0.2477]]      #linRaw values, they take a very long time to compute
+    Acc = [[0.9404,0.9449,0.9377,0.9281]]      #linRaw values, they take a very long time to compute
     for dim in [40,80,200]:
         pca = PCA(n_components = dim)
         X = pca.fit_transform(rawX)
         X_test = pca.transform(rawX_test)
         acc = []
         for c in [0.01,0.1,1,10]:
-            clf = svm.LinearSVR(C=c)
+            clf = svm.SVC(kernel='linear',C=c)
             clf.fit(X, Y)
             results = np.rint(clf.predict(X_test))
             accuracy = sum(results==Y_test)/len(Y_test)
             acc.append(accuracy)
+            print('Linear SVM Accuracy with ',dim, ' dimensions, for C= ', c, ' ', accuracy)
         Acc.append(acc)
     print(Acc)
     fig = plt.figure(figsize = (8,8))
@@ -68,7 +69,9 @@ def plot_lin():
         ax.plot(C,acc)
     ax.legend(['raw', 'd=40', 'd=80', 'd=200'])
     plt.show()
-
+'''
+Acc = [[0.9404, 0.9449, 0.9377, 0.9281],[0.9231, 0.933, 0.9333, 0.9325],[0.9384, 0.9405, 0.9404, 0.94],[0.9399, 0.944, 0.94 0.9356]]
+'''
 
 
 def RBF40():
@@ -99,5 +102,5 @@ def RBF40():
 
 if __name__ == '__main__':
     #linRaw()
-    plot_lin()
+    #plot_lin()
     #RBF40()
